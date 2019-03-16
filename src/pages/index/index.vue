@@ -19,7 +19,7 @@
     >
       <block v-for="(item,index) in imgUrls" :key="index">
         <swiper-item>
-          <image :src="item" class="slide-image" mode="aspectFill"></image>
+          <image :src="item.image_src" class="slide-image" mode="aspectFill"></image>
         </swiper-item>
       </block>
     </swiper>
@@ -36,7 +36,7 @@
 
     <!-- 产品类别 -->
     <view class="pro">
-      <view class="h1">产品类别</view>
+      <view class="h1">时尚女装</view>
       <view class="proBox">
         <view class="proLeft">
           <image src="https://lg-igjc8p1o-1256763078.cos.ap-shanghai.myqcloud.com/upload/pic_floor01_1@2x.png"></image>
@@ -58,9 +58,9 @@ export default {
   data() {
     return {
       imgUrls: [
-        "https://lg-igjc8p1o-1256763078.cos.ap-shanghai.myqcloud.com/upload/banner1.png",
-        "https://lg-igjc8p1o-1256763078.cos.ap-shanghai.myqcloud.com/upload/banner2.png",
-        "https://lg-igjc8p1o-1256763078.cos.ap-shanghai.myqcloud.com/upload/banner3.png"
+        // "https://lg-igjc8p1o-1256763078.cos.ap-shanghai.myqcloud.com/upload/banner1.png",
+        // "https://lg-igjc8p1o-1256763078.cos.ap-shanghai.myqcloud.com/upload/banner2.png",
+        // "https://lg-igjc8p1o-1256763078.cos.ap-shanghai.myqcloud.com/upload/banner3.png"
       ],
       circular:true,
       // indicatorColor:"rgba(255,255,255,0.3)",
@@ -76,6 +76,18 @@ export default {
   components: {},
 
   methods: {},
+
+  onLoad(){
+    wx.request({
+      method:"get",
+      url: 'https://autumnfish.cn/wx/api/public/v1/home/swiperdata', 
+      success:(res)=> {
+        console.log(res);
+        const {message} = res.data;
+        this.imgUrls = message;
+      }
+    })
+  },
 
   created() {
     // let app = getApp()
