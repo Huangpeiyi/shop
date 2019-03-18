@@ -27,27 +27,31 @@
 
     <!-- 导航按钮 -->
     <view class="navBox">
-      <image src="https://lg-igjc8p1o-1256763078.cos.ap-shanghai.myqcloud.com/upload/icon_index_nav_4@2x.png" mode="aspectfill"></image>
-      <image src="https://lg-igjc8p1o-1256763078.cos.ap-shanghai.myqcloud.com/upload/icon_index_nav_3@2x.png" mode="aspectfill"></image>
-      <image src="https://lg-igjc8p1o-1256763078.cos.ap-shanghai.myqcloud.com/upload/icon_index_nav_2@2x.png" mode="aspectfill"></image>
-      <image src="https://lg-igjc8p1o-1256763078.cos.ap-shanghai.myqcloud.com/upload/icon_index_nav_1@2x.png" mode="aspectfill"></image>
+      <block v-for="(item,index) in catitems" :key="index">
+        <image :src="item.image_src" mode="aspectfill"></image>
+      </block>
     </view>
     <!-- 导航按钮 end-->
 
     <!-- 产品类别 -->
     <view class="pro">
-      <view class="h1">时尚女装</view>
+      <block v-for="(item,index) in floordata" :key="index">
+      <view class="h1">
+        <image :src="item.floor_title.image_src"></image>
+        <!-- title -->
+      </view>
       <view class="proBox">
         <view class="proLeft">
-          <image src="https://lg-igjc8p1o-1256763078.cos.ap-shanghai.myqcloud.com/upload/pic_floor01_1@2x.png"></image>
+          <image :src="item.product_list[0].image_src"></image>
         </view>
         <view class="proRight">
-          <image src="https://lg-igjc8p1o-1256763078.cos.ap-shanghai.myqcloud.com/upload/pic_floor01_2@2x.png"></image>
-          <image src="https://lg-igjc8p1o-1256763078.cos.ap-shanghai.myqcloud.com/upload/pic_floor01_3@2x.png"></image>
-          <image src="https://lg-igjc8p1o-1256763078.cos.ap-shanghai.myqcloud.com/upload/pic_floor01_4@2x.png"></image>
-          <image src="https://lg-igjc8p1o-1256763078.cos.ap-shanghai.myqcloud.com/upload/pic_floor01_5@2x.png"></image>
+          <block v-for="(subItem,subIndex) in item.product_list" :key="subIndex">
+            <!-- <image v-if="subIndex!==0" :src="item.product_list[subIndex].image_src"></image> -->
+            <image v-if="subIndex!==0" :src="subItem.image_src"></image>
+          </block>
         </view>
       </view>
+      </block>
     </view>
     <!-- 产品类别 end-->
   </div>
@@ -57,11 +61,9 @@
 export default {
   data() {
     return {
-      imgUrls: [
-        // "https://lg-igjc8p1o-1256763078.cos.ap-shanghai.myqcloud.com/upload/banner1.png",
-        // "https://lg-igjc8p1o-1256763078.cos.ap-shanghai.myqcloud.com/upload/banner2.png",
-        // "https://lg-igjc8p1o-1256763078.cos.ap-shanghai.myqcloud.com/upload/banner3.png"
-      ],
+      imgUrls: [],
+      catitems:[],
+      floordata:[],
       circular:true,
       // indicatorColor:"rgba(255,255,255,0.3)",
       // indicatorActiveColor:"rgba(255,255,255,1)",
@@ -78,15 +80,36 @@ export default {
   methods: {},
 
   onLoad(){
-    wx.request({
+    //轮播图数据渲染
+    wx.request({    
       method:"get",
-      url: 'https://autumnfish.cn/wx/api/public/v1/home/swiperdata', 
+      url: 'https://www.zhengzhicheng.cn/api/public/v1/home/swiperdata', 
       success:(res)=> {
         console.log(res);
         const {message} = res.data;
         this.imgUrls = message;
       }
-    })
+    });
+    //导航数据渲染
+    wx.request({    
+      method:"get",
+      url: 'https://www.zhengzhicheng.cn/api/public/v1/home/catitems', 
+      success:(res)=> {
+        console.log(res);
+        const {message} = res.data;
+        this.catitems = message;
+      }
+    });
+    //楼层数据渲染
+    wx.request({    
+      method:"get",
+      url: 'https://www.zhengzhicheng.cn/api/public/v1/home/floordata', 
+      success:(res)=> {
+        console.log(res);
+        const {message} = res.data;
+        this.floordata = message;
+      }
+    });
   },
 
   created() {
