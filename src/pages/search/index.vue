@@ -1,7 +1,6 @@
 <template>
-  <div>
-    搜索页面
-  </div>
+  <view>
+  </view>
 </template>
 
 <script>

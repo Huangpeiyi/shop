@@ -2,9 +2,10 @@
   <div>
 
     <!-- 搜索 -->
-    <view class="search-in">
+    <!-- <view class="search-in">
       <navigator url="/pages/search/main" hover-class="none"><icon type="search" size="16" /> 搜索</navigator>
-    </view>
+    </view> -->
+    <search></search>
     <!-- 搜索 end-->
 
     <!-- 轮播图 -->
@@ -58,6 +59,8 @@
 </template>
 
 <script>
+//引入组件
+import Search from "../../components/Search"
 export default {
   data() {
     return {
@@ -75,7 +78,9 @@ export default {
     };
   },
 
-  components: {},
+  components: {
+    Search
+  },
 
   methods: {},
 
@@ -125,26 +130,6 @@ swiper{
 image {
   width:100%;
   height:100%;
-}
-.search-in{
-  width:750rpx;
-  height:100rpx;
-  background-color: #eb4450;
-  padding:20rpx;
-  box-sizing:border-box;
-}
-.search-in navigator {
-  width:100%;
-  height:60rpx;
-  background:#fff;
-  border-radius: 4px;
-  display:flex;
-  justify-content: center;
-  align-items: center;
-  font-size:24rpx;
-}
-.search-in navigator icon{
-  margin-right:10rpx;
 }
 .proBox{
   width:750rpx;

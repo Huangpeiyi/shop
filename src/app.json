@@ -5,7 +5,9 @@
     "pages/classify/main",
     "pages/cart/main",
     "pages/my/main" ,
-    "pages/search/main" 
+    "pages/search/main" ,
+    "pages/goods_list/main",
+    "pages/goods_detail/main"
   ],
   "window": {
     "backgroundTextStyle":"light",
