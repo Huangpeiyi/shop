@@ -65,6 +65,8 @@ export default {
     },
     inputSumbit(){
         this.history.unshift(this.inputVal);
+        //数组去重
+        this.history=[...new Set(this.history)];
         wx.setStorageSync('history',this.history);
         wx.redirectTo({ url: '/pages/goods_list/main?keyword='+this.inputVal });
     },
