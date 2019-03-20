@@ -47,4 +47,7 @@ export default {
   -webkit-transition: width 2s;
   -o-transition: width 2s;
 }
+
+/* 在全局中导入字体图标 */
+@import 'style/iconfont.wxss';
 </style>
