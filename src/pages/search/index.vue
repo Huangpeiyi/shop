@@ -9,6 +9,7 @@
             :value="keyword"
             v-model="inputVal"
             @confirm="inputSumbit"
+            @input="inputHandle"
             />
           </view>
           <button class="cancel" size="mini" v-show="inputVal" @tap="clearInput">取消</button>
@@ -44,6 +45,7 @@ export default {
       keyword:'',
       inputVal:'',
       history:[],
+      tips:[],
     }
   },
   onLoad(query){
@@ -75,6 +77,13 @@ export default {
     },
     gotoGoodsDetail(id){
         wx.navigateTo({ url: '/pages/goods_detail/main?goods_id='+id });
+    },
+    inputHandle(){
+        getTips({
+            query:this.inputVal
+        }).then((res)=>{
+            this.tips=res.data.message;
+        })
     }
   },
 
