@@ -89,6 +89,8 @@ export default {
       goods_id:query.goods_id
     }).then((res)=>{
       this.detail=res.data.message;
+      // 1.0.4 IOS不支持 webp 的格式，所以统一替换成 jpg 的图片路径
+      this.detail.goods_introduce = this.detail.goods_introduce.replace(/jpg.+?webp/g,'jpg');
     });
   },
   methods:{

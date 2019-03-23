@@ -9,7 +9,7 @@
 	},
 	"miniprogramRoot": "dist/wx/",
 	"compileType": "miniprogram",
-	"appid": "wx97ec8a4f2a654fca",
+	"appid": "wxfb52f2d7b2f6123a",
 	"projectname": "shop",
 	"condition": {
 		"search": {
@@ -29,7 +29,7 @@
 			"list": []
 		},
 		"miniprogram": {
-			"current": 4,
+			"current": 7,
 			"list": [
 				{
 					"id": -1,
@@ -64,6 +64,27 @@
 					"name": "商品详情",
 					"pathName": "pages/goods_detail/main",
 					"query": "goods_id=666",
+					"scene": null
+				},
+				{
+					"id": 5,
+					"name": "购物车",
+					"pathName": "pages/cart/main",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "登录授权",
+					"pathName": "pages/auth/main",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "订单结算",
+					"pathName": "pages/pay/main",
+					"query": "",
 					"scene": null
 				}
 			]

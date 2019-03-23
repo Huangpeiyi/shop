@@ -1,9 +1,8 @@
 <template>
   <view >
-    <block v-if="computedData._cartLength">
+    
     <!-- 顶部地址选择 -->
-    <view class="cart-top" @tap="chooseAddressHandle">
-      <block v-if="address.username">
+    <view class="cart-top" >
         <view class="user" >
           <text>收货人：{{address.username}}</text>
           <text>{{address.tel}}</text>
@@ -11,12 +10,6 @@
         <view class="address">
           收货地址：{{address.addressInfo}}
         </view>
-      </block>
-      <block v-else>
-        <view class="add-address">
-          <button>+添加收货地址</button>
-        </view>
-      </block>  
       <view class="address-border"></view>     
     </view>
     <!-- 顶部地址选择 end-->
@@ -26,14 +19,7 @@
     <view class="ware-list">
       <!-- 2.0.1 商品列表 -->
       <block v-for="(item,index) in cartList" :key="index">
-        <view class="ware-item" @tap="gotoDetail(item.goods_id)">
-          <!-- 2.0.2 左边按钮 -->
-          <view class="choice-button" >
-            <view 
-            :class="['iconfont', 'icon-choosehandle',{'selectbtn':item.selected===true}]" 
-            @tap.stop="item.selected=!item.selected"
-            ></view>
-          </view>
+        <view class="ware-item" @tap="gotoDetail(item.goods_id)" v-if="item.selected">
           <!-- 2.0.3 右边图片和商品信息 -->
           <div class="ware-content">
             <!-- 2.0.4 图片 -->
@@ -50,9 +36,7 @@
                   ￥ {{item.goods_price}}
                 </view>
                 <div class="calculate">
-                  <div class="rect" @tap.stop="changeCount(item.goods_id,-1)">-</div>
-                  <div class="number">{{item.count}}</div>
-                  <div class="rect" @tap.stop="changeCount(item.goods_id,1)">+</div>
+                  X {{item.count}}
                 </div>
               </div>
             </view>
@@ -62,42 +46,21 @@
     </view>
     <!-- 3.0 底部固定条 -->
     <div class="cart-total">
-      <view class="total-button" @tap="allSelectHandle(computedData._cartLength === computedData._count)">
-        <!-- <view 
-          :class="['iconfont','icon-choosehandle',{'allSelect': allSelect === true}]"
-          ></view> -->
-          <!-- 这种写法不行 -->
-          <!-- <view 
-          :class="['iconfont','icon-choosehandle',{computedData._cartLength === computedData._count? 'allSelect':''}]"
-          ></view> -->
-          <!-- 写法1：-->
-          <view 
-          :class="['iconfont','icon-choosehandle',{'allSelect': computedData._cartLength === computedData._count}]"
-          ></view>
-          <!-- 写法2：-->
-          <!-- <view 
-          class="iconfont icon-choosehandle"
-          :class="computedData._cartLength === computedData._count?'allSelect':''"
-          ></view> -->
-          全选
-        <!-- 全选{{computedData._cartLength}} -->
-      </view>
       <view class="total-center">
         <view>合计:<text class="color-red">￥ {{computedData._allPrice}}</text> </view>
         <div class="price-tips">包含运费</div>
       </view>
-      <view class="accounts" @tap="gotoPay">
-        结算({{computedData._count}})
+      <view class="accounts" @tap="payorder">
+        支付({{computedData._count}})
       </view>
     </div>
-    </block>
-    <block v-else>
-      购物车空空如也
-    </block>
+    
+    
   </view>
 </template>
 
 <script>
+import { createOrder , payOrder , payOrderUpdata } from "@/api";
 
 export default {
   data () {
@@ -119,12 +82,11 @@ export default {
       for(let key in this.cartList){
         let item=this.cartList[key];
         if(item.selected){
-          _allPrice = item.goods_price *item.count + _allPrice;
+          _allPrice += this.cartList[key].goods_price ;
           _count++;
         }
         
       }
-      wx.setStorageSync('cartList',this.cartList);
       return {_allPrice,_count,_cartLength};
     }
   },
@@ -136,81 +98,87 @@ export default {
   },
 
   methods: {
-    //选择收货地址
-    chooseAddressHandle(){
-      wx.chooseAddress({
-        success:(res)=>{
-          // console.log(res.userName)
-          // console.log(res.postalCode)
-          // console.log(res.provinceName)
-          // console.log(res.cityName)
-          // console.log(res.countyName)
-          // console.log(res.detailInfo)
-          // console.log(res.nationalCode)
-          // console.log(res.telNumber)
-          let { userName , telNumber ,provinceName,cityName,countyName,detailInfo}=res;
-          this.address={
-            username:userName,
-            tel:telNumber,
-            addressInfo:`${provinceName}${cityName}${countyName}${detailInfo}`
-          }
-          //添加到本地存储
-          wx.setStorageSync('address',this.address);
-        }
-      })
-    },
-    //点击全选
-    allSelectHandle(bl){
-      for(let key in this.cartList){
-        let item = this.cartList[key];
-        item.selected=!bl;
-      }
-    },
-    //点击数量减的时候
-    // rectHandle(id){
-    //   if(this.cartList[id].count===1) return;
-    //   this.cartList[id].count--;
-    //   //这个的count是有变化的，但是一刷新页面又变回
-    //   console.log(this.cartList);
-    //   //数量减少后为什么不能把本地存储的数据更新？
-    //   //this.cartList=wx.getStorageSync('cartList',this.cartList);
-    // },
-    //点击数量加的时候
-    // addHandle(id){
-    //   this.cartList[id].count++;
-    //   //数量增加后为什么不能把本地存储的数据更新？
-    //   //this.cartList==wx.setStorageSync('cartList',this.cartList);
-    // },
-    //改变数量
-    changeCount(id,num){
-      //修改商品数量
-      this.cartList[id].count+=num;
-      if(this.cartList[id].count===0){
-        //弹出模态框
-        wx.showModal({
-          title: '提示',
-          content: '确定要删除吗',
-          showCancel:true,
-          confirmText: '删除',
-          confirmColor: '#f00', 
-          success:res=> {
-            if (res.confirm) {
-              //console.log('用户点击确定');
-              this.cartList[id].count=1;
-              delete this.cartList[id];
-            } else if (res.cancel) {
-              //console.log('用户点击取消');
-              this.cartList[id].count=1;
-            }
-          }
-        })
-      }
-    },
     gotoDetail(id){
       wx.navigateTo({url:`/pages/goods_detail/main?goods_id=`+id});
     },
-    gotoPay(){
-      wx.navigateTo({ url: '/pages/pay/main' });
+    payorder(){
+      //wx.navigateTo({url:`/pages/goods_detail/main?goods_id=`+id});
+      //console.log("发起微信支付");
+      const token = wx.getStorageSync('token');
+      // 7.0.1 判断是否有 token
+      if(token){
+        //console.log("支付逻辑");
+        //获取支付金额
+        let order_price = this.computedData._allPrice;
+        //获取订单地址
+        let consignee_addr = this.address.addressInfo;
+        //初始化商品列表数组
+        let goods = [];
+        for(let key in this.cartList){
+          let item = this.cartList[key];
+          if(item.selected){
+            // 7.3.5 获取订单提交时候的商品信息
+            let obj = {
+              goods_id : item.goods_id,
+              goods_price : item.goods_price,
+              goods_number : item.count
+            };
+            goods.push(obj);
+          }
+        }
+        //向服务器创建订单
+        createOrder({
+          order_price,
+          consignee_addr,
+          goods
+        }).then(res=>{
+          // console.log(res.data.message)
+          const { order_number } = res.data.message;       
+          // 7.4 向服务器发起订单支付
+          payOrder({
+            order_number
+          }).then(res=>{
+            // 7.4.1 获取订单支付对象
+            const { pay } = res.data.message;
+            // console.log(pay);
+
+            
+            // 7.5 调用微信支付接口
+            wx.requestPayment({
+              ...pay,
+              success: res => {
+                console.log("用户成功支付");
+                // 7.6 向服务器传递订单编号，更新订单的支付状态
+                payOrderUpdata({
+                  order_number
+                })                
+                wx.switchTab({ url: '/pages/cart/main' });
+              },
+              fail: () => {
+                console.log("用户支付失败");
+                wx.switchTab({ url: '/pages/cart/main' });
+              },
+              complete:()=>{
+                console.log(1);
+                //把本地存储的选中的删除
+                let _cartList={};
+                for(let key in this.cartList){
+                  let item = this.cartList[key];
+                  if(!item.selected){
+                    //console.log(item);
+                    _cartList[key]=item;
+                  }
+                }
+                this.cartList=_cartList;
+                wx.setStorageSync('cartList',this.cartList);
+              }
+            });
+          })
+        })
+      }else{
+        console.log("登录授权");
+        wx.navigateTo({ url: '/pages/auth/main' });
+      }    
     }
   }
 }
